@@ -40,7 +40,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
   };
 
   return (
-    <div className="w-full aspect-video bg-slate-950 rounded-xl border border-slate-800 relative overflow-hidden flex items-end justify-center p-8 shadow-2xl">
+    <div className="w-full h-full bg-slate-950 rounded-xl relative overflow-hidden flex items-end justify-center p-8">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
@@ -100,8 +100,8 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
         </g>
       </svg>
       
-      <div className="absolute bottom-4 right-4 text-slate-500 text-xs font-mono">
-        Scale: 1 grid ≈ 5 meters (approx)
+      <div className="absolute bottom-4 right-4 text-slate-500 text-xs font-mono bg-slate-950/50 px-2 py-1 rounded">
+        Scale: 1 grid ≈ 5 meters
       </div>
     </div>
   );

@@ -1,132 +1,186 @@
 import React, { useState, useMemo } from 'react';
-import { SCREEN_DATA } from './constants';
-import { SortOption, ViewMode } from './types';
+import { SCREEN_DATA, REGIONS } from './constants';
+import { SortOption, ViewMode, Region } from './types';
 import ScreenVisualizer from './components/ScreenVisualizer';
 import ScreenTable from './components/ScreenTable';
 import ComparisonCards from './components/ComparisonCards';
-import { Tv, List, Grid, ArrowDownWideNarrow, Info } from 'lucide-react';
+import { Tv, List, Grid, Info, MapPin } from 'lucide-react';
 
 const App: React.FC = () => {
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('area');
-  const [viewMode, setViewMode] = useState<ViewMode>('visual');
+  const [viewMode, setViewMode] = useState<ViewMode>('table'); // Default to table
+  const [selectedRegions, setSelectedRegions] = useState<Region[]>(['North']); // Default to North
+
+  const toggleRegion = (regionId: Region) => {
+    setSelectedRegions(prev => 
+      prev.includes(regionId) 
+        ? prev.filter(id => id !== regionId) 
+        : [...prev, regionId]
+    );
+  };
 
   const sortedScreens = useMemo(() => {
-    return [...SCREEN_DATA].sort((a, b) => {
+    const filtered = SCREEN_DATA.filter(screen => selectedRegions.includes(screen.region));
+    
+    return filtered.sort((a, b) => {
       if (sortBy === 'area') return b.area - a.area;
       if (sortBy === 'width') return b.width - a.width;
       if (sortBy === 'height') return b.height - a.height;
       return 0;
     });
-  }, [sortBy]);
+  }, [sortBy, selectedRegions]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 pb-20">
+    <div className="h-screen bg-slate-950 text-slate-200 flex flex-col overflow-hidden font-sans">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="flex-none h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-6 z-50">
           <div className="flex items-center gap-2">
-            <Tv className="w-6 h-6 text-cyan-500" />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            <Tv className="w-5 h-5 text-cyan-500" />
+            <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               Cinema Screen War
             </h1>
           </div>
           <div className="flex items-center gap-4">
-             <a href="https://github.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors text-sm hidden sm:block">
-               Data Source: Public Listings
+             <a 
+                href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="text-slate-500 hover:text-white transition-colors text-xs hidden sm:block"
+             >
+               Source: PTT (st40182)
              </a>
           </div>
-        </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Main Content Dashboard Layout */}
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         
-        {/* Intro */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
-                台灣最大影廳銀幕比一比
-            </h2>
-            <p className="text-slate-400 text-lg">
-                直觀比較全台頂級影廳的銀幕尺寸。從 IMAX 雷射到 8K 巨幕，誰才是真正的視覺霸主？
-            </p>
-        </div>
-
-        {/* Visualizer Section */}
-        <section className="space-y-4">
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-semibold text-white flex items-center gap-2">
-                    <Grid className="w-5 h-5 text-cyan-500" />
-                    尺寸疊加比較
-                </h3>
-                <span className="text-xs text-slate-500 px-2 py-1 bg-slate-900 rounded border border-slate-800">
-                  Tip: Hover over items below to highlight
-                </span>
-            </div>
-            <ScreenVisualizer screens={SCREEN_DATA} highlightId={highlightId} />
-        </section>
-
-        {/* Controls */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-6">
-            <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
-                <button
-                    onClick={() => setViewMode('visual')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        viewMode === 'visual' ? 'bg-cyan-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
-                >
-                    <Grid className="w-4 h-4" />
-                    Cards View
-                </button>
-                <button
-                    onClick={() => setViewMode('table')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                        viewMode === 'table' ? 'bg-cyan-600 text-white shadow-lg' : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                    }`}
-                >
-                    <List className="w-4 h-4" />
-                    Table View
-                </button>
+        {/* LEFT PANEL: Visualizer (Main Focus) */}
+        <div className="flex-1 flex flex-col p-4 lg:p-6 overflow-hidden relative bg-slate-950">
+            {/* Intro / Title */}
+            <div className="flex-none mb-4 flex justify-between items-end">
+                <div>
+                    <h2 className="text-2xl font-extrabold text-white tracking-tight">
+                        全台最大影廳銀幕比一比
+                    </h2>
+                    <p className="text-slate-400 text-sm mt-1">
+                        直觀比較頂級影廳尺寸，誰才是視覺霸主？
+                    </p>
+                </div>
+                 <div className="text-xs text-slate-500 px-2 py-1 bg-slate-900 rounded border border-slate-800 hidden lg:block">
+                      Hover list items to highlight
+                 </div>
             </div>
 
-            <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-400 flex items-center gap-1">
-                    <ArrowDownWideNarrow className="w-4 h-4" /> Sort by:
-                </span>
-                <select 
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as SortOption)}
-                    className="bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5"
-                >
-                    <option value="area">總面積 (Area)</option>
-                    <option value="width">寬度 (Width)</option>
-                    <option value="height">高度 (Height)</option>
-                </select>
+            {/* Visualizer Container - Fills remaining height */}
+            <div className="flex-1 relative min-h-[200px] bg-slate-900/30 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+                {sortedScreens.length > 0 ? (
+                   <ScreenVisualizer screens={sortedScreens} highlightId={highlightId} />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-500 flex-col gap-2">
+                        <Grid className="w-8 h-8 opacity-20" />
+                        <p>請於右側選擇區域以顯示銀幕比較</p>
+                    </div>
+                )}
+            </div>
+
+            {/* Footer Info */}
+            <div className="flex-none mt-4 flex items-start gap-3 text-xs text-slate-500">
+                 <Info className="w-4 h-4 flex-shrink-0 mt-0.5 text-cyan-500/50" />
+                 <div>
+                    <span className="mr-2">資料來源：<a href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">PTT Theater 板 (st40182)</a></span>
+                    <span className="hidden sm:inline"> | *標記為特殊規格或官方宣稱 | IMAX(雷射)通常指Commercial IMAX Laser</span>
+                 </div>
             </div>
         </div>
 
-        {/* List/Table View */}
-        <section className="animate-fade-in-up">
-            {viewMode === 'visual' ? (
-                <ComparisonCards 
-                    screens={sortedScreens} 
-                    onHover={setHighlightId} 
-                    highlightId={highlightId} 
-                />
-            ) : (
-                <ScreenTable 
-                    screens={sortedScreens} 
-                    onHover={setHighlightId}
-                    highlightId={highlightId} 
-                />
-            )}
-        </section>
+        {/* RIGHT PANEL: Sidebar (Controls & List) */}
+        <div className="flex-none w-full lg:w-[400px] xl:w-[460px] flex flex-col bg-slate-900/30 border-t lg:border-t-0 lg:border-l border-slate-800 lg:h-full z-10 shadow-xl">
+            
+            {/* Sidebar Controls (Sticky at top of sidebar) */}
+            <div className="flex-none p-4 space-y-4 border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm">
+                 {/* Region Select */}
+                 <div className="space-y-2">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3" />
+                        REGIONS
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                        {REGIONS.map((region) => (
+                            <button
+                                key={region.id}
+                                onClick={() => toggleRegion(region.id)}
+                                className={`px-2.5 py-1 rounded text-xs font-medium transition-all border ${
+                                    selectedRegions.includes(region.id)
+                                        ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-200'
+                                        : 'bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                                }`}
+                            >
+                                {region.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
-        {/* Info Footer */}
-        <div className="mt-12 bg-slate-900/50 p-6 rounded-xl border border-slate-800 flex items-start gap-4">
-            <Info className="w-6 h-6 text-cyan-500 flex-shrink-0 mt-1" />
-            <div className="text-sm text-slate-400 space-y-2">
-                <p>資料來源為網際網路公開資訊整理，實際尺寸可能因測量方式或官方更新略有出入。帶有「*」號標記為特殊規格或官方宣稱數據。</p>
-                <p>IMAX (雷射) 通常指 Commercial IMAX Laser，TITAN 與 LUXE 均為自有品牌巨幕廳。</p>
+                {/* View & Sort */}
+                <div className="flex items-center justify-between gap-4">
+                     <div className="flex bg-slate-800/50 p-0.5 rounded-lg border border-slate-700/50">
+                        <button
+                            onClick={() => setViewMode('table')}
+                            className={`p-1.5 rounded-md transition-all ${
+                                viewMode === 'table' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                            }`}
+                            title="Table View"
+                        >
+                            <List className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('visual')}
+                            className={`p-1.5 rounded-md transition-all ${
+                                viewMode === 'visual' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                            }`}
+                            title="Card View"
+                        >
+                            <Grid className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <select 
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as SortOption)}
+                        className="bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-1.5 outline-none"
+                    >
+                        <option value="area">Sort by Area</option>
+                        <option value="width">Sort by Width</option>
+                        <option value="height">Sort by Height</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* Scrollable List Area */}
+            <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+                 {sortedScreens.length === 0 ? (
+                     <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-xl">
+                        <p className="text-slate-600 text-sm">No regions selected</p>
+                    </div>
+                ) : (
+                    <div className="animate-fade-in-up">
+                        {viewMode === 'visual' ? (
+                            <ComparisonCards 
+                                screens={sortedScreens} 
+                                onHover={setHighlightId} 
+                                highlightId={highlightId} 
+                            />
+                        ) : (
+                            <ScreenTable 
+                                screens={sortedScreens} 
+                                onHover={setHighlightId}
+                                highlightId={highlightId} 
+                            />
+                        )}
+                    </div>
+                )}
             </div>
         </div>
 

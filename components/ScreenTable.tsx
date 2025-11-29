@@ -9,40 +9,33 @@ interface ScreenTableProps {
 
 const ScreenTable: React.FC<ScreenTableProps> = ({ screens, onHover, highlightId }) => {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-800 shadow-xl bg-slate-900/50 backdrop-blur-sm">
-      <table className="w-full text-sm text-left text-slate-400">
-        <thead className="text-xs text-slate-200 uppercase bg-slate-800 border-b border-slate-700">
+    <div className="overflow-x-auto rounded-lg border border-slate-800 shadow-lg bg-slate-900/50 backdrop-blur-sm">
+      <table className="w-full text-xs text-left text-slate-400">
+        <thead className="text-[10px] text-slate-400 uppercase bg-slate-800/80 border-b border-slate-700">
           <tr>
-            <th scope="col" className="px-6 py-4">影廳</th>
-            <th scope="col" className="px-6 py-4">種類</th>
-            <th scope="col" className="px-6 py-4 hidden md:table-cell">聲道</th>
-            <th scope="col" className="px-6 py-4 text-right">尺寸 (寬x高)</th>
-            <th scope="col" className="px-6 py-4 text-right">面積 (m²)</th>
+            <th scope="col" className="px-3 py-2">影廳</th>
+            <th scope="col" className="px-2 py-2 text-right">尺寸</th>
+            <th scope="col" className="px-3 py-2 text-right">面積</th>
           </tr>
         </thead>
         <tbody>
           {screens.map((screen) => (
             <tr 
                 key={screen.id} 
-                className={`border-b border-slate-800 transition-colors duration-150 cursor-default
+                className={`border-b border-slate-800/50 transition-colors duration-150 cursor-pointer
                     ${highlightId === screen.id ? 'bg-cyan-900/30 text-white' : 'hover:bg-slate-800/50'}
                 `}
                 onMouseEnter={() => onHover(screen.id)}
                 onMouseLeave={() => onHover(null)}
             >
-              <td className="px-6 py-4 font-medium text-slate-100 whitespace-nowrap">
-                {screen.name}
+              <td className="px-3 py-2">
+                <div className="font-medium text-slate-200">{screen.name}</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">{screen.type}</div>
               </td>
-              <td className="px-6 py-4">
-                <span className="bg-slate-700 text-slate-300 text-xs font-medium px-2.5 py-0.5 rounded border border-slate-600">
-                    {screen.type}
-                </span>
+              <td className="px-2 py-2 text-right font-mono text-[11px] whitespace-nowrap">
+                {screen.width} × {screen.height}
               </td>
-              <td className="px-6 py-4 hidden md:table-cell">{screen.audio}</td>
-              <td className="px-6 py-4 text-right font-mono">
-                {screen.width.toFixed(1)}m × {screen.height.toFixed(1)}m
-              </td>
-              <td className="px-6 py-4 text-right font-bold text-cyan-400">
+              <td className="px-3 py-2 text-right font-bold text-cyan-500 text-sm">
                 {screen.area}
               </td>
             </tr>

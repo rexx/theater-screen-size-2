@@ -1,3 +1,5 @@
+export type Region = 'North' | 'Central' | 'South' | 'East' | 'Historical';
+
 export interface CinemaScreen {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface CinemaScreen {
   height: number;
   area: number;
   location: string;
+  region: Region;
 }
 
 export type SortOption = 'area' | 'width' | 'height';

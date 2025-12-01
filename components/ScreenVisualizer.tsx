@@ -12,7 +12,9 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
   const maxDimensions = useMemo(() => {
     const maxWidth = Math.max(...screens.map(s => s.width), 30); // Min 30m width base
     const maxHeight = Math.max(...screens.map(s => s.height), 23); // Min 23m height base
-    return { width: maxWidth * 1.1, height: maxHeight * 1.1 }; // Add padding
+    // Tighten the width multiplier to 1.02 to maximize horizontal usage on mobile
+    // Keep height slightly looser for the human label at the bottom
+    return { width: maxWidth * 1.02, height: maxHeight * 1.05 }; 
   }, [screens]);
 
   // Sort screens by area descending for "stacking" order (largest in back)
@@ -40,7 +42,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
   };
 
   return (
-    <div className="w-full h-full bg-slate-950 rounded-xl relative overflow-hidden flex items-end justify-center p-8">
+    <div className="w-full h-full bg-slate-950 rounded-xl relative overflow-hidden flex items-end justify-center p-1 sm:p-2 lg:p-8">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
@@ -100,7 +102,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
         </g>
       </svg>
       
-      <div className="absolute bottom-4 right-4 text-slate-500 text-xs font-mono bg-slate-950/50 px-2 py-1 rounded">
+      <div className="absolute bottom-1 right-2 lg:bottom-4 lg:right-4 text-slate-500 text-[10px] lg:text-xs font-mono bg-slate-950/50 px-2 py-1 rounded pointer-events-none">
         Scale: 1 grid ≈ 5 meters
       </div>
     </div>

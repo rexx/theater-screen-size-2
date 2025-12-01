@@ -27,6 +27,7 @@ const ScreenTable: React.FC<ScreenTableProps> = ({ screens, onHover, highlightId
                 `}
                 onMouseEnter={() => onHover(screen.id)}
                 onMouseLeave={() => onHover(null)}
+                onClick={() => onHover(highlightId === screen.id ? null : screen.id)}
             >
               <td className="px-3 py-2">
                 <div className="font-medium text-slate-200">{screen.name}</div>

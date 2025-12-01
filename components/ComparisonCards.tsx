@@ -24,6 +24,7 @@ const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, hig
                         `}
                         onMouseEnter={() => onHover(screen.id)}
                         onMouseLeave={() => onHover(null)}
+                        onClick={() => onHover(isHighlighted ? null : screen.id)}
                     >
                         <div className="flex justify-between items-start mb-2">
                             <div>

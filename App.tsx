@@ -4,7 +4,7 @@ import { SortOption, ViewMode, Region } from './types';
 import ScreenVisualizer from './components/ScreenVisualizer';
 import ScreenTable from './components/ScreenTable';
 import ComparisonCards from './components/ComparisonCards';
-import { Tv, List, Grid, Info, MapPin } from 'lucide-react';
+import { Clapperboard, List, Grid, MapPin, Info } from 'lucide-react';
 
 const App: React.FC = () => {
   const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -32,24 +32,28 @@ const App: React.FC = () => {
   }, [sortBy, selectedRegions]);
 
   return (
-    <div className="h-screen bg-slate-950 text-slate-200 flex flex-col overflow-hidden font-sans">
+    <div className="fixed inset-0 bg-slate-950 text-slate-200 flex flex-col overflow-hidden font-sans">
       {/* Header */}
-      <header className="flex-none h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 lg:px-6 z-50">
-          <div className="flex items-center gap-2">
-            <Tv className="w-5 h-5 text-cyan-500" />
+      <header className="flex-none h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 lg:px-6 z-50 gap-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Clapperboard className="w-5 h-5 text-cyan-500" />
             <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent truncate">
               Cinema Screen War
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-             <a 
-                href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" 
-                target="_blank" 
-                rel="noreferrer" 
-                className="text-slate-500 hover:text-white transition-colors text-xs hidden sm:block"
-             >
-               Source: PTT (st40182)
-             </a>
+          <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-slate-500 overflow-hidden justify-end min-w-0">
+             <Info className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+             <div className="truncate flex items-center">
+                 <span className="hidden sm:inline mr-1">資料來源：</span>
+                 <a 
+                    href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="hover:text-cyan-400 transition-colors text-slate-400 underline decoration-slate-700 underline-offset-2"
+                 >
+                   PTT Theater 板 (st40182)
+                 </a>
+             </div>
           </div>
       </header>
 
@@ -60,26 +64,11 @@ const App: React.FC = () => {
         <div className="
             flex-none h-[40vh] landscape:h-auto landscape:flex-1 lg:h-auto lg:flex-1 
             flex flex-col 
-            p-2 lg:p-6 
+            p-0
             overflow-hidden relative bg-slate-950 z-0
         ">
-            {/* Intro / Title */}
-            <div className="flex-none mb-2 lg:mb-4 flex justify-between items-end">
-                <div>
-                    <h2 className="text-lg lg:text-2xl font-extrabold text-white tracking-tight">
-                        全台最大影廳銀幕比一比
-                    </h2>
-                    <p className="text-slate-400 text-xs lg:text-sm mt-0.5 lg:mt-1 hidden sm:block">
-                        直觀比較頂級影廳尺寸，誰才是視覺霸主？
-                    </p>
-                </div>
-                 <div className="text-xs text-slate-500 px-2 py-1 bg-slate-900 rounded border border-slate-800 hidden lg:block">
-                      Hover list items to highlight
-                 </div>
-            </div>
-
             {/* Visualizer Container - Fills remaining height */}
-            <div className="flex-1 relative min-h-0 bg-slate-900/30 rounded-xl lg:rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+            <div className="flex-1 relative min-h-0 bg-slate-900/30 overflow-hidden">
                 {sortedScreens.length > 0 ? (
                    <ScreenVisualizer screens={sortedScreens} highlightId={highlightId} />
                 ) : (
@@ -89,20 +78,12 @@ const App: React.FC = () => {
                     </div>
                 )}
             </div>
-
-            {/* Footer Info */}
-            <div className="flex-none mt-2 lg:mt-4 flex items-start gap-3 text-[10px] lg:text-xs text-slate-500">
-                 <Info className="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0 mt-0.5 text-cyan-500/50" />
-                 <div>
-                    <span className="mr-2">資料來源：<a href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">PTT Theater 板</a></span>
-                    <span className="hidden sm:inline"> | *標記為特殊規格或官方宣稱</span>
-                 </div>
-            </div>
         </div>
 
         {/* RIGHT PANEL: Sidebar (Controls & List) */}
         <div className="
             flex-1 lg:flex-none 
+            min-h-0
             w-full landscape:w-[320px] lg:w-[400px] xl:w-[460px] 
             flex flex-col 
             bg-slate-900/30 border-t border-slate-800 
@@ -194,6 +175,11 @@ const App: React.FC = () => {
                         )}
                     </div>
                 )}
+            </div>
+
+            {/* Footer Disclaimer */}
+            <div className="flex-none p-2 border-t border-slate-800 bg-slate-900/50 text-[10px] text-slate-500 text-center">
+                *標記為特殊規格或官方宣稱
             </div>
         </div>
 

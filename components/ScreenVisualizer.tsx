@@ -42,7 +42,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
   };
 
   return (
-    <div className="w-full h-full bg-slate-950 rounded-xl relative overflow-hidden flex items-end justify-center p-1 sm:p-2 lg:p-8">
+    <div className="w-full h-full bg-slate-950 relative overflow-hidden flex items-end justify-center p-1 sm:p-2 lg:p-4">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
@@ -102,7 +102,13 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
         </g>
       </svg>
       
-      <div className="absolute bottom-1 right-2 lg:bottom-4 lg:right-4 text-slate-500 text-[10px] lg:text-xs font-mono bg-slate-950/50 px-2 py-1 rounded pointer-events-none">
+      {/* Hover Hint - Overlay Top Left */}
+      <div className="absolute top-2 left-2 lg:top-4 lg:left-4 text-slate-500 text-[10px] lg:text-xs px-2 py-1 bg-slate-900/50 rounded border border-slate-800/50 pointer-events-none backdrop-blur-sm">
+        Hover list to highlight
+      </div>
+
+      {/* Scale Legend - Overlay Top Right */}
+      <div className="absolute top-2 right-2 lg:top-4 lg:right-4 text-slate-500 text-[10px] lg:text-xs font-mono bg-slate-950/50 px-2 py-1 rounded pointer-events-none backdrop-blur-sm">
         Scale: 1 grid ≈ 5 meters
       </div>
     </div>

@@ -38,7 +38,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <Clapperboard className="w-5 h-5 text-cyan-500" />
             <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent truncate">
-              Cinema Screen War
+              台灣影廳大銀幕尺寸比一比
             </h1>
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-slate-500 overflow-hidden justify-end min-w-0">

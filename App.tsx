@@ -34,26 +34,12 @@ const App: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-slate-950 text-slate-200 flex flex-col overflow-hidden font-sans">
       {/* Header */}
-      <header className="flex-none h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 lg:px-6 z-50 gap-4">
-          <div className="flex items-center gap-2 flex-shrink-0">
+      <header className="flex-none h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 lg:px-6 z-50">
+          <div className="flex items-center gap-2">
             <Clapperboard className="w-5 h-5 text-cyan-500" />
             <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent truncate">
               台灣影廳大銀幕尺寸比一比
             </h1>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-slate-500 overflow-hidden justify-end min-w-0">
-             <Info className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
-             <div className="truncate flex items-center">
-                 <span className="hidden sm:inline mr-1">資料來源：</span>
-                 <a 
-                    href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="hover:text-cyan-400 transition-colors text-slate-400 underline decoration-slate-700 underline-offset-2"
-                 >
-                   PTT Theater 板 (st40182)
-                 </a>
-             </div>
           </div>
       </header>
 
@@ -100,12 +86,21 @@ const App: React.FC = () => {
                         <MapPin className="w-3 h-3" />
                         REGIONS
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+                    {/* Horizontal scrolling container for regions */}
+                    <div 
+                        className="flex flex-nowrap gap-1.5 overflow-x-auto pb-1 -mx-1 px-1" 
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                        <style>{`
+                            div::-webkit-scrollbar {
+                                display: none;
+                            }
+                        `}</style>
                         {REGIONS.map((region) => (
                             <button
                                 key={region.id}
                                 onClick={() => toggleRegion(region.id)}
-                                className={`px-2 py-1 lg:px-2.5 lg:py-1 rounded text-[10px] lg:text-xs font-medium transition-all border ${
+                                className={`flex-none whitespace-nowrap px-2 py-1 lg:px-2.5 lg:py-1 rounded text-[10px] lg:text-xs font-medium transition-all border ${
                                     selectedRegions.includes(region.id)
                                         ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-200'
                                         : 'bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
@@ -159,7 +154,7 @@ const App: React.FC = () => {
                         <p className="text-slate-600 text-sm">No regions selected</p>
                     </div>
                 ) : (
-                    <div className="animate-fade-in-up pb-safe">
+                    <div className="animate-fade-in-up pb-safe flex flex-col gap-4">
                         {viewMode === 'visual' ? (
                             <ComparisonCards 
                                 screens={sortedScreens} 
@@ -173,13 +168,29 @@ const App: React.FC = () => {
                                 highlightId={highlightId} 
                             />
                         )}
+                        
+                        {/* Disclaimer moved to bottom of list */}
+                        <div className="text-[10px] text-slate-500 text-center py-2">
+                            *標記為特殊規格或官方宣稱
+                        </div>
                     </div>
                 )}
             </div>
 
-            {/* Footer Disclaimer */}
-            <div className="flex-none p-2 border-t border-slate-800 bg-slate-900/50 text-[10px] text-slate-500 text-center">
-                *標記為特殊規格或官方宣稱
+            {/* Footer Source */}
+            <div className="flex-none p-3 border-t border-slate-800 bg-slate-900/50 text-[10px] text-slate-500 flex flex-col items-center gap-2 text-center">
+                <div className="flex items-center gap-1">
+                     <Info className="w-3 h-3" />
+                     <span>資料來源：</span>
+                     <a 
+                        href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="hover:text-cyan-400 transition-colors text-slate-400 underline decoration-slate-700 underline-offset-2"
+                     >
+                       PTT Theater 板 (st40182)
+                     </a>
+                </div>
             </div>
         </div>
 

@@ -4,10 +4,11 @@ import { CinemaScreen } from '../types';
 interface ScreenTableProps {
   screens: CinemaScreen[];
   onHover: (id: string | null) => void;
+  onSelect: (id: string) => void;
   highlightId?: string | null;
 }
 
-const ScreenTable: React.FC<ScreenTableProps> = ({ screens, onHover, highlightId }) => {
+const ScreenTable: React.FC<ScreenTableProps> = ({ screens, onHover, onSelect, highlightId }) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-800 shadow-lg bg-slate-900/50 backdrop-blur-sm">
       <table className="w-full text-xs text-left text-slate-400">
@@ -27,7 +28,7 @@ const ScreenTable: React.FC<ScreenTableProps> = ({ screens, onHover, highlightId
                 `}
                 onMouseEnter={() => onHover(screen.id)}
                 onMouseLeave={() => onHover(null)}
-                onClick={() => onHover(highlightId === screen.id ? null : screen.id)}
+                onClick={() => onSelect(screen.id)}
             >
               <td className="px-3 py-2">
                 <div className="font-medium text-slate-200">{screen.name}</div>

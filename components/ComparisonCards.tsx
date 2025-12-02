@@ -4,10 +4,11 @@ import { CinemaScreen } from '../types';
 interface ComparisonCardsProps {
     screens: CinemaScreen[];
     onHover: (id: string | null) => void;
+    onSelect: (id: string) => void;
     highlightId?: string | null;
 }
 
-const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, highlightId }) => {
+const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, onSelect, highlightId }) => {
     return (
         <div className="grid grid-cols-1 gap-3">
             {screens.map((screen) => {
@@ -24,7 +25,7 @@ const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, hig
                         `}
                         onMouseEnter={() => onHover(screen.id)}
                         onMouseLeave={() => onHover(null)}
-                        onClick={() => onHover(isHighlighted ? null : screen.id)}
+                        onClick={() => onSelect(screen.id)}
                     >
                         <div className="flex justify-between items-start mb-2">
                             <div>

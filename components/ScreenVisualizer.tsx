@@ -5,9 +5,10 @@ import { HUMAN_HEIGHT } from '../constants';
 interface ScreenVisualizerProps {
   screens: CinemaScreen[];
   highlightId?: string | null;
+  onSelect?: (id: string | null) => void;
 }
 
-const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightId }) => {
+const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightId, onSelect }) => {
   // Determine SVG viewbox dimensions based on the largest screen
   const maxDimensions = useMemo(() => {
     const maxWidth = Math.max(...screens.map(s => s.width), 30); // Min 30m width base
@@ -42,7 +43,10 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
   };
 
   return (
-    <div className="w-full h-full bg-slate-950 relative overflow-hidden flex items-end justify-center p-1 sm:p-2 lg:p-4">
+    <div 
+        className="w-full h-full bg-slate-950 relative overflow-hidden flex items-end justify-center p-1 sm:p-2 lg:p-4"
+        onClick={() => onSelect && onSelect(null)} // Click background to deselect
+    >
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
@@ -69,7 +73,14 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
             const isActive = highlightId === screen.id;
 
             return (
-              <g key={screen.id} className="transition-all duration-500">
+              <g 
+                key={screen.id} 
+                className="transition-all duration-500"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (onSelect) onSelect(screen.id);
+                }}
+              >
                 <rect
                   x={x}
                   y={y}
@@ -102,9 +113,9 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
         </g>
       </svg>
       
-      {/* Hover Hint - Overlay Top Left */}
+      {/* Hover/Tap Hint - Overlay Top Left */}
       <div className="absolute top-2 left-2 lg:top-4 lg:left-4 text-slate-500 text-[10px] lg:text-xs px-2 py-1 bg-slate-900/50 rounded border border-slate-800/50 pointer-events-none backdrop-blur-sm">
-        Hover list to highlight
+        Click / Hover list to highlight
       </div>
 
       {/* Scale Legend - Overlay Top Right */}

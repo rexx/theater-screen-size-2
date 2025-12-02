@@ -7,7 +7,8 @@ import ComparisonCards from './components/ComparisonCards';
 import { Clapperboard, List, Grid, MapPin, Info } from 'lucide-react';
 
 const App: React.FC = () => {
-  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('area');
   const [viewMode, setViewMode] = useState<ViewMode>('table'); // Default to table
   const [selectedRegions, setSelectedRegions] = useState<Region[]>(['North']); // Default to North
@@ -18,6 +19,25 @@ const App: React.FC = () => {
         ? prev.filter(id => id !== regionId) 
         : [...prev, regionId]
     );
+  };
+
+  // Determine which ID to display: Hover takes precedence (preview), otherwise show Selected
+  const displayId = hoveredId ?? selectedId;
+
+  const handleHover = (id: string | null) => {
+    setHoveredId(id);
+  };
+
+  const handleSelect = (id: string | null) => {
+    // Clear hover state on click to prevent sticky hover on mobile
+    setHoveredId(null);
+    
+    if (id === null) {
+        setSelectedId(null);
+        return;
+    }
+    // Toggle selection if clicking the same item
+    setSelectedId(prev => prev === id ? null : id);
   };
 
   const sortedScreens = useMemo(() => {
@@ -56,7 +76,11 @@ const App: React.FC = () => {
             {/* Visualizer Container - Fills remaining height */}
             <div className="flex-1 relative min-h-0 bg-slate-900/30 overflow-hidden">
                 {sortedScreens.length > 0 ? (
-                   <ScreenVisualizer screens={sortedScreens} highlightId={highlightId} />
+                   <ScreenVisualizer 
+                      screens={sortedScreens} 
+                      highlightId={displayId} 
+                      onSelect={handleSelect}
+                   />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-500 flex-col gap-2">
                         <Grid className="w-8 h-8 opacity-20" />
@@ -158,14 +182,16 @@ const App: React.FC = () => {
                         {viewMode === 'visual' ? (
                             <ComparisonCards 
                                 screens={sortedScreens} 
-                                onHover={setHighlightId} 
-                                highlightId={highlightId} 
+                                onHover={handleHover} 
+                                onSelect={handleSelect}
+                                highlightId={displayId} 
                             />
                         ) : (
                             <ScreenTable 
                                 screens={sortedScreens} 
-                                onHover={setHighlightId}
-                                highlightId={highlightId} 
+                                onHover={handleHover}
+                                onSelect={handleSelect}
+                                highlightId={displayId} 
                             />
                         )}
                         

@@ -8,15 +8,29 @@ interface ScreenVisualizerProps {
   onSelect?: (id: string | null) => void;
 }
 
+const GRID_SIZE = 5; // meters
+
 const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightId, onSelect }) => {
-  // Determine SVG viewbox dimensions based on the largest screen
+  // Determine SVG viewbox dimensions based on the CURRENT screens
   const maxDimensions = useMemo(() => {
-    const maxWidth = Math.max(...screens.map(s => s.width), 30); // Min 30m width base
-    const maxHeight = Math.max(...screens.map(s => s.height), 23); // Min 23m height base
-    // Tighten the width multiplier to 1.02 to maximize horizontal usage on mobile
-    // Keep height slightly looser for the human label at the bottom
-    return { width: maxWidth * 1.02, height: maxHeight * 1.05 }; 
+    // Default fallback if no screens exist
+    if (screens.length === 0) return { width: 30, height: 23 };
+
+    const maxWidth = Math.max(...screens.map(s => s.width));
+    const maxHeight = Math.max(...screens.map(s => s.height));
+
+    // Add reasonable padding (10-15%)
+    // Use a small minimum floor (e.g., 10m width) so single small screens don't look awkwardly huge
+    const calculatedWidth = Math.max(maxWidth, 10) * 1.1; 
+    const calculatedHeight = Math.max(maxHeight, 8) * 1.2; // More height padding for labels/human
+
+    return { width: calculatedWidth, height: calculatedHeight }; 
   }, [screens]);
+
+  // Calculate grid alignment
+  // We want the grid to align with the floor (maxDimensions.height)
+  // Since pattern starts at (0,0), we offset it so a line lands exactly on maxDimensions.height
+  const gridOffsetY = maxDimensions.height % GRID_SIZE;
 
   // Sort screens by area descending for "stacking" order (largest in back)
   const sortedScreens = useMemo(() => {
@@ -42,19 +56,37 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
     return colors[index % colors.length];
   };
 
+  // Human figure dimensions
+  const headRadius = 0.15;
+  const headDiameter = headRadius * 2;
+  const bodyHeight = HUMAN_HEIGHT - headDiameter;
+
   return (
     <div 
         className="w-full h-full bg-slate-950 relative overflow-hidden flex items-end justify-center p-1 sm:p-2 lg:p-4"
         onClick={() => onSelect && onSelect(null)} // Click background to deselect
     >
-      {/* Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
-
       <svg
         viewBox={`0 0 ${maxDimensions.width} ${maxDimensions.height}`}
         className="w-full h-full filter drop-shadow-lg"
         preserveAspectRatio="xMidYBottom"
       >
+        <defs>
+            {/* Grid Pattern: 5x5 units = 5x5 meters */}
+            <pattern 
+                id="gridPattern" 
+                width={GRID_SIZE} 
+                height={GRID_SIZE} 
+                patternUnits="userSpaceOnUse"
+                patternTransform={`translate(0, ${gridOffsetY})`}
+            >
+                <path d={`M ${GRID_SIZE} 0 L 0 0 0 ${GRID_SIZE}`} fill="none" stroke="#1e293b" strokeWidth="0.1" />
+            </pattern>
+        </defs>
+
+        {/* Background Grid Layer */}
+        <rect x="0" y="0" width="100%" height="100%" fill="url(#gridPattern)" />
+
         {/* Ground Line */}
         <line 
             x1="0" 
@@ -106,10 +138,14 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
         })}
 
         {/* Human Reference */}
-        <g transform={`translate(${maxDimensions.width / 2 - 0.5}, ${maxDimensions.height - HUMAN_HEIGHT})`}>
-             <rect width="0.4" height={HUMAN_HEIGHT} className="fill-yellow-400" rx="0.1" />
-             <circle cx="0.2" cy="-0.3" r="0.2" className="fill-yellow-400" />
-             <text x="1" y="1" className="fill-yellow-400 text-[0.5px]" style={{fontSize: '0.6px'}}>1.75m 人類</text>
+        {/* Group positioned so that (0,0) is the TOP of the human figure */}
+        <g transform={`translate(${maxDimensions.width / 2 - 0.2}, ${maxDimensions.height - HUMAN_HEIGHT})`}>
+             {/* Head */}
+             <circle cx="0.2" cy={headRadius} r={headRadius} className="fill-yellow-400" />
+             {/* Body */}
+             <rect x="0" y={headDiameter} width="0.4" height={bodyHeight} className="fill-yellow-400" rx="0.05" />
+             
+             <text x="0.6" y="1.2" className="fill-yellow-400 text-[0.5px]" style={{fontSize: '0.6px'}}>1.75m 人類</text>
         </g>
       </svg>
       
@@ -120,7 +156,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
 
       {/* Scale Legend - Overlay Top Right */}
       <div className="absolute top-2 right-2 lg:top-4 lg:right-4 text-slate-500 text-[10px] lg:text-xs font-mono bg-slate-950/50 px-2 py-1 rounded pointer-events-none backdrop-blur-sm">
-        Scale: 1 grid ≈ 5 meters
+        Scale: 1 grid = {GRID_SIZE} meters
       </div>
     </div>
   );

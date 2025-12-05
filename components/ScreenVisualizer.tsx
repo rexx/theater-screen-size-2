@@ -141,6 +141,25 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
             );
         })}
 
+        {/* Highlight Overlay (Rendered last to be on top of everything) */}
+        {highlightId && (() => {
+            const screen = screens.find(s => s.id === highlightId);
+            if (!screen) return null;
+            const x = (maxDimensions.width - screen.width) / 2;
+            const y = maxDimensions.height - screen.height;
+            
+            return (
+                <rect
+                    x={x}
+                    y={y}
+                    width={screen.width}
+                    height={screen.height}
+                    className="stroke-cyan-300 fill-none pointer-events-none drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]"
+                    strokeWidth={0.25}
+                />
+            );
+        })()}
+
         {/* Human Reference */}
         {/* Group positioned so that (0,0) is the TOP of the human figure */}
         <g transform={`translate(${maxDimensions.width / 2 - 0.2}, ${maxDimensions.height - HUMAN_HEIGHT})`}>

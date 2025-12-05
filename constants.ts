@@ -21,6 +21,10 @@ export const UI_TEXT: Record<string, Record<Language, string>> = {
     zh: '區域',
     en: 'REGIONS',
   },
+  searchPlaceholder: {
+    zh: '搜尋影廳名稱、地點...',
+    en: 'Search cinema, location...',
+  },
   sortByArea: {
     zh: '依面積排序',
     en: 'Sort by Area',
@@ -42,8 +46,8 @@ export const UI_TEXT: Record<string, Record<Language, string>> = {
     en: 'Card View',
   },
   noRegions: {
-    zh: '未選擇區域',
-    en: 'No regions selected',
+    zh: '無符合條件的影廳',
+    en: 'No cinemas match your criteria',
   },
   disclaimer: {
     zh: '*標記為特殊規格或官方宣稱',
@@ -540,7 +544,7 @@ export const SCREEN_DATA: CinemaScreen[] = [
     location: 'Kaohsiung',
     locationZh: '高雄',
     region: 'Historical'
-  }
+  },
 ];
 
 export const HUMAN_HEIGHT = 1.75;

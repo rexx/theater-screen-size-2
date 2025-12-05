@@ -4,7 +4,7 @@ import { SortOption, ViewMode, Region, Language } from './types';
 import ScreenVisualizer from './components/ScreenVisualizer';
 import ScreenTable from './components/ScreenTable';
 import ComparisonCards from './components/ComparisonCards';
-import { Clapperboard, List, Grid, MapPin, Info, Languages } from 'lucide-react';
+import { Clapperboard, List, Grid, MapPin, Info, Languages, Search, ChevronDown } from 'lucide-react';
 
 const App: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -13,6 +13,7 @@ const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('table'); // Default to table
   const [selectedRegions, setSelectedRegions] = useState<Region[]>(['North']); // Default to North
   const [language, setLanguage] = useState<Language>('zh');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleRegion = (regionId: Region) => {
     setSelectedRegions(prev => 
@@ -46,7 +47,25 @@ const App: React.FC = () => {
   };
 
   const sortedScreens = useMemo(() => {
-    const filtered = SCREEN_DATA.filter(screen => selectedRegions.includes(screen.region));
+    const filtered = SCREEN_DATA.filter(screen => {
+        // 1. Region Filter
+        if (!selectedRegions.includes(screen.region)) return false;
+
+        // 2. Search Filter
+        if (searchQuery.trim() !== '') {
+            const q = searchQuery.toLowerCase();
+            return (
+                screen.name.toLowerCase().includes(q) ||
+                screen.nameEn.toLowerCase().includes(q) ||
+                screen.locationZh.includes(q) ||
+                screen.location.toLowerCase().includes(q) ||
+                screen.type.toLowerCase().includes(q) ||
+                screen.typeEn.toLowerCase().includes(q)
+            );
+        }
+
+        return true;
+    });
     
     return filtered.sort((a, b) => {
       if (sortBy === 'area') return b.area - a.area;
@@ -54,7 +73,7 @@ const App: React.FC = () => {
       if (sortBy === 'height') return b.height - a.height;
       return 0;
     });
-  }, [sortBy, selectedRegions]);
+  }, [sortBy, selectedRegions, searchQuery]);
 
   const t = UI_TEXT;
 
@@ -100,7 +119,7 @@ const App: React.FC = () => {
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-500 flex-col gap-2">
                         <Grid className="w-8 h-8 opacity-20" />
-                        <p className="text-sm">{t.selectRegion[language]}</p>
+                        <p className="text-sm">{t.noRegions[language]}</p>
                     </div>
                 )}
             </div>
@@ -119,16 +138,17 @@ const App: React.FC = () => {
         ">
             
             {/* Sidebar Controls (Sticky at top of sidebar) */}
-            <div className="flex-none p-3 lg:p-4 space-y-3 lg:space-y-4 border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm">
-                 {/* Region Select */}
-                 <div className="space-y-2">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+            <div className="flex-none p-3 space-y-3 border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm z-20">
+                 
+                 {/* Row 1: Regions (Inline) */}
+                 <div className="flex items-center gap-3">
+                    <div className="flex-none text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
                         <MapPin className="w-3 h-3" />
-                        {t.regionsLabel[language]}
+                        <span className="hidden xl:inline">{t.regionsLabel[language]}</span>
                     </div>
                     {/* Horizontal scrolling container for regions */}
                     <div 
-                        className="flex flex-nowrap gap-1.5 overflow-x-auto pb-1 -mx-1 px-1" 
+                        className="flex-1 flex flex-nowrap gap-1.5 overflow-x-auto -mr-1 pr-1" 
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         <style>{`
@@ -140,7 +160,7 @@ const App: React.FC = () => {
                             <button
                                 key={region.id}
                                 onClick={() => toggleRegion(region.id)}
-                                className={`flex-none whitespace-nowrap px-2 py-1 lg:px-2.5 lg:py-1 rounded text-[10px] lg:text-xs font-medium transition-all border ${
+                                className={`flex-none whitespace-nowrap px-2.5 py-1 rounded text-[10px] lg:text-xs font-medium transition-all border ${
                                     selectedRegions.includes(region.id)
                                         ? 'bg-cyan-600/20 border-cyan-500/50 text-cyan-200'
                                         : 'bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
@@ -150,11 +170,13 @@ const App: React.FC = () => {
                             </button>
                         ))}
                     </div>
-                </div>
+                 </div>
 
-                {/* View & Sort */}
-                <div className="flex items-center justify-between gap-4">
-                     <div className="flex bg-slate-800/50 p-0.5 rounded-lg border border-slate-700/50">
+                 {/* Row 2: Tools rearranged: ViewToggle -> Search -> Sort */}
+                 <div className="flex items-center gap-2">
+                    
+                    {/* 1. View Toggles (Moved to Left) */}
+                    <div className="flex-none flex bg-slate-800/50 p-0.5 rounded-lg border border-slate-700/50">
                         <button
                             onClick={() => setViewMode('table')}
                             className={`p-1.5 rounded-md transition-all ${
@@ -162,7 +184,7 @@ const App: React.FC = () => {
                             }`}
                             title={t.tableView[language]}
                         >
-                            <List className="w-4 h-4" />
+                            <List className="w-3.5 h-3.5" />
                         </button>
                         <button
                             onClick={() => setViewMode('visual')}
@@ -171,19 +193,35 @@ const App: React.FC = () => {
                             }`}
                             title={t.cardView[language]}
                         >
-                            <Grid className="w-4 h-4" />
+                            <Grid className="w-3.5 h-3.5" />
                         </button>
                     </div>
 
-                    <select 
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                        className="bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-1.5 outline-none"
-                    >
-                        <option value="area">{t.sortByArea[language]}</option>
-                        <option value="width">{t.sortByWidth[language]}</option>
-                        <option value="height">{t.sortByHeight[language]}</option>
-                    </select>
+                    {/* 2. Search Input (Middle, Flex Grow) */}
+                    <div className="relative flex-1 group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                        <input 
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={t.searchPlaceholder[language]}
+                            className="w-full bg-slate-800/50 border border-slate-700/50 text-slate-200 text-xs rounded-lg pl-8 pr-2 py-1.5 outline-none focus:ring-1 focus:ring-cyan-500 placeholder-slate-600"
+                        />
+                    </div>
+
+                    {/* 3. Sort Dropdown (Right) */}
+                    <div className="relative flex-none">
+                        <select 
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as SortOption)}
+                            className="appearance-none bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs rounded-lg focus:ring-1 focus:ring-cyan-500 block py-1.5 pl-2 pr-6 outline-none cursor-pointer hover:bg-slate-800 transition-colors"
+                        >
+                            <option value="area">{t.sortByArea[language]}</option>
+                            <option value="width">{t.sortByWidth[language]}</option>
+                            <option value="height">{t.sortByHeight[language]}</option>
+                        </select>
+                        <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500 pointer-events-none" />
+                    </div>
                 </div>
             </div>
 

@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { SCREEN_DATA, REGIONS } from './constants';
-import { SortOption, ViewMode, Region } from './types';
+import { SCREEN_DATA, REGIONS, UI_TEXT } from './constants';
+import { SortOption, ViewMode, Region, Language } from './types';
 import ScreenVisualizer from './components/ScreenVisualizer';
 import ScreenTable from './components/ScreenTable';
 import ComparisonCards from './components/ComparisonCards';
-import { Clapperboard, List, Grid, MapPin, Info } from 'lucide-react';
+import { Clapperboard, List, Grid, MapPin, Info, Languages } from 'lucide-react';
 
 const App: React.FC = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -12,6 +12,7 @@ const App: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('area');
   const [viewMode, setViewMode] = useState<ViewMode>('table'); // Default to table
   const [selectedRegions, setSelectedRegions] = useState<Region[]>(['North']); // Default to North
+  const [language, setLanguage] = useState<Language>('zh');
 
   const toggleRegion = (regionId: Region) => {
     setSelectedRegions(prev => 
@@ -19,6 +20,10 @@ const App: React.FC = () => {
         ? prev.filter(id => id !== regionId) 
         : [...prev, regionId]
     );
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
   };
 
   // Determine which ID to display: Hover takes precedence (preview), otherwise show Selected
@@ -51,16 +56,26 @@ const App: React.FC = () => {
     });
   }, [sortBy, selectedRegions]);
 
+  const t = UI_TEXT;
+
   return (
     <div className="fixed inset-0 bg-slate-950 text-slate-200 flex flex-col overflow-hidden font-sans">
       {/* Header */}
       <header className="flex-none h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 lg:px-6 z-50">
-          <div className="flex items-center gap-2">
-            <Clapperboard className="w-5 h-5 text-cyan-500" />
+          <div className="flex items-center gap-2 min-w-0">
+            <Clapperboard className="w-5 h-5 text-cyan-500 flex-shrink-0" />
             <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent truncate">
-              台灣影廳大銀幕尺寸比一比
+              {t.appTitle[language]}
             </h1>
           </div>
+          
+          <button 
+            onClick={toggleLanguage}
+            className="flex-none ml-2 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors text-slate-300"
+            title={language === 'zh' ? 'Switch to English' : '切換為中文'}
+          >
+            <Languages className="w-5 h-5" />
+          </button>
       </header>
 
       {/* Main Content Dashboard Layout */}
@@ -80,11 +95,12 @@ const App: React.FC = () => {
                       screens={sortedScreens} 
                       highlightId={displayId} 
                       onSelect={handleSelect}
+                      language={language}
                    />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-500 flex-col gap-2">
                         <Grid className="w-8 h-8 opacity-20" />
-                        <p className="text-sm">請於選單選擇區域</p>
+                        <p className="text-sm">{t.selectRegion[language]}</p>
                     </div>
                 )}
             </div>
@@ -108,7 +124,7 @@ const App: React.FC = () => {
                  <div className="space-y-2">
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
                         <MapPin className="w-3 h-3" />
-                        REGIONS
+                        {t.regionsLabel[language]}
                     </div>
                     {/* Horizontal scrolling container for regions */}
                     <div 
@@ -130,7 +146,7 @@ const App: React.FC = () => {
                                         : 'bg-slate-800/50 border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-300'
                                 }`}
                             >
-                                {region.label}
+                                {language === 'zh' ? region.label : region.labelEn}
                             </button>
                         ))}
                     </div>
@@ -144,7 +160,7 @@ const App: React.FC = () => {
                             className={`p-1.5 rounded-md transition-all ${
                                 viewMode === 'table' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
-                            title="Table View"
+                            title={t.tableView[language]}
                         >
                             <List className="w-4 h-4" />
                         </button>
@@ -153,7 +169,7 @@ const App: React.FC = () => {
                             className={`p-1.5 rounded-md transition-all ${
                                 viewMode === 'visual' ? 'bg-cyan-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
-                            title="Card View"
+                            title={t.cardView[language]}
                         >
                             <Grid className="w-4 h-4" />
                         </button>
@@ -164,9 +180,9 @@ const App: React.FC = () => {
                         onChange={(e) => setSortBy(e.target.value as SortOption)}
                         className="bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-1.5 outline-none"
                     >
-                        <option value="area">Sort by Area</option>
-                        <option value="width">Sort by Width</option>
-                        <option value="height">Sort by Height</option>
+                        <option value="area">{t.sortByArea[language]}</option>
+                        <option value="width">{t.sortByWidth[language]}</option>
+                        <option value="height">{t.sortByHeight[language]}</option>
                     </select>
                 </div>
             </div>
@@ -175,7 +191,7 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-3 lg:p-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
                  {sortedScreens.length === 0 ? (
                      <div className="text-center py-12 border-2 border-dashed border-slate-800 rounded-xl">
-                        <p className="text-slate-600 text-sm">No regions selected</p>
+                        <p className="text-slate-600 text-sm">{t.noRegions[language]}</p>
                     </div>
                 ) : (
                     <div className="animate-fade-in-up pb-safe flex flex-col gap-4">
@@ -185,19 +201,21 @@ const App: React.FC = () => {
                                 onHover={handleHover} 
                                 onSelect={handleSelect}
                                 highlightId={displayId} 
+                                language={language}
                             />
                         ) : (
                             <ScreenTable 
                                 screens={sortedScreens} 
                                 onHover={handleHover}
                                 onSelect={handleSelect}
-                                highlightId={displayId} 
+                                highlightId={displayId}
+                                language={language}
                             />
                         )}
                         
                         {/* Disclaimer moved to bottom of list */}
                         <div className="text-[10px] text-slate-500 text-center py-2">
-                            *標記為特殊規格或官方宣稱
+                            {t.disclaimer[language]}
                         </div>
                     </div>
                 )}
@@ -207,7 +225,7 @@ const App: React.FC = () => {
             <div className="flex-none p-3 border-t border-slate-800 bg-slate-900/50 text-[10px] text-slate-500 flex flex-col items-center gap-2 text-center">
                 <div className="flex items-center gap-1">
                      <Info className="w-3 h-3" />
-                     <span>資料來源：</span>
+                     <span>{t.source[language]}</span>
                      <a 
                         href="https://www.ptt.cc/bbs/Theater/M.1577599080.A.684.html" 
                         target="_blank" 

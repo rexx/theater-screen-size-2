@@ -1,18 +1,23 @@
 import React from 'react';
-import { CinemaScreen } from '../types';
+import { CinemaScreen, Language } from '../types';
 
 interface ComparisonCardsProps {
     screens: CinemaScreen[];
     onHover: (id: string | null) => void;
     onSelect: (id: string) => void;
     highlightId?: string | null;
+    language: Language;
 }
 
-const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, onSelect, highlightId }) => {
+const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, onSelect, highlightId, language }) => {
     return (
         <div className="grid grid-cols-1 gap-3">
             {screens.map((screen) => {
                 const isHighlighted = highlightId === screen.id;
+                const name = language === 'zh' ? screen.name : screen.nameEn;
+                const type = language === 'zh' ? screen.type : screen.typeEn;
+                const location = language === 'zh' ? screen.locationZh : screen.location;
+
                 return (
                     <div 
                         key={screen.id}
@@ -30,9 +35,9 @@ const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, onS
                         <div className="flex justify-between items-start mb-2">
                             <div>
                                 <h3 className={`font-bold text-sm leading-tight ${isHighlighted ? 'text-cyan-400' : 'text-slate-200'}`}>
-                                    {screen.name}
+                                    {name}
                                 </h3>
-                                <div className="text-xs text-slate-500 mt-0.5">{screen.location}</div>
+                                <div className="text-xs text-slate-500 mt-0.5">{location}</div>
                             </div>
                             <div className="text-right">
                                 <div className="text-lg font-bold text-white leading-none">{screen.area}</div>
@@ -41,7 +46,7 @@ const ComparisonCards: React.FC<ComparisonCardsProps> = ({ screens, onHover, onS
                         </div>
 
                         <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-2 mt-2">
-                             <span className="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] text-slate-300">{screen.type}</span>
+                             <span className="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] text-slate-300">{type}</span>
                              <span className="font-mono">{screen.width}m × {screen.height}m</span>
                         </div>
                     </div>

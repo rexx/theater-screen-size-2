@@ -1,16 +1,19 @@
 import React, { useMemo } from 'react';
-import { CinemaScreen } from '../types';
-import { HUMAN_HEIGHT } from '../constants';
+import { CinemaScreen, Language } from '../types';
+import { HUMAN_HEIGHT, UI_TEXT } from '../constants';
 
 interface ScreenVisualizerProps {
   screens: CinemaScreen[];
   highlightId?: string | null;
   onSelect?: (id: string | null) => void;
+  language: Language;
 }
 
 const GRID_SIZE = 5; // meters
 
-const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightId, onSelect }) => {
+const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightId, onSelect, language }) => {
+  const t = UI_TEXT;
+
   // Determine SVG viewbox dimensions based on the CURRENT screens
   const maxDimensions = useMemo(() => {
     // Default fallback if no screens exist
@@ -69,7 +72,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
       <svg
         viewBox={`0 0 ${maxDimensions.width} ${maxDimensions.height}`}
         className="w-full h-full filter drop-shadow-lg"
-        preserveAspectRatio="xMidYBottom"
+        preserveAspectRatio="xMidYMax"
       >
         <defs>
             {/* Grid Pattern: 5x5 units = 5x5 meters */}
@@ -103,6 +106,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
             const y = maxDimensions.height - screen.height;
             const styleClass = getColor(index, screen.id);
             const isActive = highlightId === screen.id;
+            const name = language === 'zh' ? screen.name : screen.nameEn;
 
             return (
               <g 
@@ -130,7 +134,7 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
                     className="fill-white text-[1px] font-bold"
                     style={{ fontSize: '0.8px' }}
                   >
-                    {screen.name} ({screen.width}m x {screen.height}m)
+                    {name} ({screen.width}m x {screen.height}m)
                   </text>
                 )}
               </g>
@@ -145,18 +149,20 @@ const ScreenVisualizer: React.FC<ScreenVisualizerProps> = ({ screens, highlightI
              {/* Body */}
              <rect x="0" y={headDiameter} width="0.4" height={bodyHeight} className="fill-yellow-400" rx="0.05" />
              
-             <text x="0.6" y="1.2" className="fill-yellow-400 text-[0.5px]" style={{fontSize: '0.6px'}}>1.75m 人類</text>
+             <text x="0.6" y="1.2" className="fill-yellow-400 text-[0.5px]" style={{fontSize: '0.6px'}}>
+                {t.humanLabel[language]}
+             </text>
         </g>
       </svg>
       
       {/* Hover/Tap Hint - Overlay Top Left */}
       <div className="absolute top-2 left-2 lg:top-4 lg:left-4 text-slate-500 text-[10px] lg:text-xs px-2 py-1 bg-slate-900/50 rounded border border-slate-800/50 pointer-events-none backdrop-blur-sm">
-        Click / Hover list to highlight
+        {t.clickHint[language]}
       </div>
 
       {/* Scale Legend - Overlay Top Right */}
       <div className="absolute top-2 right-2 lg:top-4 lg:right-4 text-slate-500 text-[10px] lg:text-xs font-mono bg-slate-950/50 px-2 py-1 rounded pointer-events-none backdrop-blur-sm">
-        Scale: 1 grid = {GRID_SIZE} meters
+        {t.scalePrefix[language]}{GRID_SIZE} {t.meters[language]}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 {
   "name": "台灣影廳大銀幕尺寸比一比",
-  "description": "A visual comparison tool for cinema screen sizes in Taiwan.",
+  "description": "專業的台灣影廳銀幕尺寸視覺化比較工具，包含 IMAX, LUXE, Titan 等各大影城數據。",
   "requestFramePermissions": []
 }

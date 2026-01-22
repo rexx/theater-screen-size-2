@@ -1,0 +1,22 @@
+
+{
+  "name": "台灣影廳大銀幕尺寸比一比",
+  "short_name": "影廳比一比",
+  "description": "專業的台灣影廳銀幕尺寸視覺化比較工具，包含 IMAX, LUXE, Titan 等各大影城數據。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#06b6d4",
+  "icons": [
+    {
+      "src": "/public/theater-screen-size-2/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/public/theater-screen-size-2/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
